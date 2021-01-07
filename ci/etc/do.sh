@@ -292,5 +292,5 @@ if [ "x${IS_CI_BUILD}" != "x1" ]; then
   cd /opt/ptl/tests/
   env
   locale
-  pbs_benchpress -t SmokeTest.test_man_pages 
+  pbs_benchpress --tags=smoke --exclude=SmokeTest.test_man_pages
 fi
