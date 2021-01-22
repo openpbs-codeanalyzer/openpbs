@@ -9,9 +9,13 @@ pr:
 pool:
   vmImage: 'ubuntu-18.04'
 
-variables:
-- name: one
-  value: initialValue 
+env:
+  - OS_TYPE=centos:8
+  - OS_TYPE=opensuse/leap:15
+  - OS_TYPE=ubuntu:20.04
+  - OS_TYPE=debian:9
+  - OS_TYPE=centos:7 BUILD_MODE=sanitize
+  - OS_TYPE=centos:7 BUILD_MODE=kerberos
    
 jobs:
   - job: runcheck
@@ -21,9 +25,9 @@ jobs:
 
   - job: c8_build_test
     dependsOn: runcheck
-    variables:
-    - name: OS_TYPE
-      value: "centos:8"
+   # variables:
+   # - name: OS_TYPE
+   #   value: "centos:8"
     steps:
     - bash: docker pull $(OS_TYPE)
     - bash: docker run -it -d -h pbs.dev.local --name pbsdev -v $(pwd):$(pwd) --privileged -w $(pwd) $(OS_TYPE) /bin/bash
@@ -32,8 +36,8 @@ jobs:
   - job: suse15_build_test
     dependsOn: runcheck
     variables:
-    - name: OS_TYPE
-      value: "opensuse/leap:15"
+    #- name: OS_TYPE
+    #  value: "opensuse/leap:15"
     - name: DOCKER_EXTRA_ARG
       value: "-e LC_ALL=C.utf8" 
     steps:
@@ -44,8 +48,8 @@ jobs:
   - job: u2004_build_test
     dependsOn: runcheck
     variables:
-    - name: OS_TYPE
-      value: "ubuntu:20.04"
+    #- name: OS_TYPE
+    #  value: "ubuntu:20.04"
     - name: DOCKER_EXTRA_ARG
       value: "-e DEBIAN_FRONTEND=noninteractive -e LANGUAGE=C.UTF-8 -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8" 
     steps:
@@ -56,23 +60,23 @@ jobs:
   - job: c7_sanitize_build_test
     dependsOn: runcheck
     variables:
-    - name: OS_TYPE
-      value: "centos:7"
+    #- name: OS_TYPE
+    #  value: "centos:7"
     - name: DOCKER_EXTRA_ARG
       value: "-e LC_ALL=en_US.utf-8 -e LANG=en_US.utf-8" 
     steps:
     - bash: docker pull $(OS_TYPE)
-    - bash: docker run -it -e BUILD_MODE=sanitize $(DOCKER_EXTRA_ARG) -d -h pbs.dev.local --name pbsdev -v $(pwd):$(pwd) --privileged -w $(pwd) $(OS_TYPE) /bin/bash
+    - bash: docker run -it $BUILD_MODE $(DOCKER_EXTRA_ARG) -d -h pbs.dev.local --name pbsdev -v $(pwd):$(pwd) --privileged -w $(pwd) $(OS_TYPE) /bin/bash
     - bash: docker exec   --privileged pbsdev .travis/do_sanitize_mode.sh
     
   - job: c7_kerberos_build
     dependsOn: runcheck
     variables:
-    - name: OS_TYPE
-      value: "centos:7"
+    #- name: OS_TYPE
+     # value: "centos:7"
     - name: DOCKER_EXTRA_ARG
       value: "-e LC_ALL=en_US.utf-8 -e LANG=en_US.utf-8" 
     steps:
     - bash: docker pull $(OS_TYPE)
-    - bash: docker run -it -e BUILD_MODE=kerberos $(DOCKER_EXTRA_ARG) -d -h pbs.dev.local --name pbsdev -v $(pwd):$(pwd) --privileged -w $(pwd) $(OS_TYPE) /bin/bash
+    - bash: docker run -it $BUILD_MODE $(DOCKER_EXTRA_ARG) -d -h pbs.dev.local --name pbsdev -v $(pwd):$(pwd) --privileged -w $(pwd) $(OS_TYPE) /bin/bash
     - bash: docker exec   --privileged pbsdev .travis/do.sh
