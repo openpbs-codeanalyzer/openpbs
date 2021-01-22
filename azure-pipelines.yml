@@ -9,6 +9,10 @@ pr:
 pool:
   vmImage: 'ubuntu-18.04'
 
+variables:
+  - name: OS_TYPE
+    values: "centos:8", "ubuntu:20.04"
+    
 jobs:
   - job: runcheck
     steps:
@@ -19,21 +23,16 @@ jobs:
     strategy:
       matrix:
         C8_build_test:
-           variables:
-           - name: OS_TYPE
-             value: "centos:8"
-        S15_build_test:
-           variables:
-             - name: OS_TYPE
-               value: "opensuse/leap:15"
-             - name: DOCKER_EXTRA_ARG
-               value: "-e LC_ALL=C.utf8"
+             OS_TYPE: "centos:8"
+        #S15_build_test:
+        #   variables:
+        #     - name: OS_TYPE
+        #       value: "opensuse/leap:15"
+        #     - name: DOCKER_EXTRA_ARG
+        #       value: "-e LC_ALL=C.utf8"
         U20_build_test:
-            variables:
-              - name: OS_TYPE
-                value: "ubuntu:20.04"
-              - name: DOCKER_EXTRA_ARG
-                value: "-e DEBIAN_FRONTEND=noninteractive -e LANGUAGE=C.UTF-8 -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8" 
+             OS_TYPE: "ubuntu:20.04"
+             DOCKER_EXTRA_ARG: "-e DEBIAN_FRONTEND=noninteractive -e LANGUAGE=C.UTF-8 -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8" 
     steps:
     - bash: docker pull $(OS_TYPE)
     - bash: docker run -it $(DOCKER_EXTRA_ARG) -d -h pbs.dev.local --name pbsdev -v $(pwd):$(pwd) --privileged -w $(pwd) $(OS_TYPE) /bin/bash
