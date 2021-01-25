@@ -33,6 +33,5 @@ jobs:
     steps:
     - script: |
              docker pull $(OS_TYPE)
-             docker run -it $(DOCKER_EXTRA_ARG) -d -h pbs.dev.local --name pbsdev -v $(pwd):$(pwd) --privileged -w $(pwd) $(OS_TYPE) /bin/bash
-             docker exec --privileged pbsdev $(PKG_INSTALL_CMD)
+             docker run -it $(DOCKER_EXTRA_ARG) -d -h pbs.dev.local --name pbsdev -v $(pwd):$(pwd) --privileged -w $(pwd) $(OS_TYPE) /bin/bash -c "$(PKG_INSTALL_CMD)"
              docker exec --privileged pbsdev .ci/ci --local
