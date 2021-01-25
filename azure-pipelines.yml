@@ -28,7 +28,8 @@ jobs:
              OS_TYPE: "ubuntu:20.04"
              DOCKER_EXTRA_ARG: "-e DEBIAN_FRONTEND=noninteractive -e LANGUAGE=C.UTF-8 -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8" 
     steps:
-    - bash: |
+    - script: |
              docker pull $(OS_TYPE)
              docker run -it $(DOCKER_EXTRA_ARG) -d -h pbs.dev.local --name pbsdev -v $(pwd):$(pwd) --privileged -w $(pwd) $(OS_TYPE) /bin/bash
-             docker exec   --privileged pbsdev .travis/do.sh
+             docker exec --privileged pbsdev .travis/do.sh
+      
