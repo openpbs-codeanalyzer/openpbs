@@ -22,17 +22,18 @@ jobs:
         C8:
            OS_TYPE: "centos:8"
            PKG_INSTALL_CMD: "yum -y install python3"
+           DOCKER_EXTRA_ARG: ""
         S15:
            OS_TYPE: "opensuse/leap:15"
            PKG_INSTALL_CMD: "zypper -n install python3"
            DOCKER_EXTRA_ARG: "-e LC_ALL=C.utf8"
         U20:
              OS_TYPE: "ubuntu:20.04"
-             PKG_INSTALL_CMD: "'apt-get -y update;apt-get -y upgrade;apt-get install -y python3'"
+             PKG_INSTALL_CMD: "apt-get -y update ; apt-get -y upgrade ; apt-get install -y python3"
              DOCKER_EXTRA_ARG: "-e DEBIAN_FRONTEND=noninteractive -e LANGUAGE=C.UTF-8 -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8" 
     steps:
     - script: |
              docker pull $(OS_TYPE)
              docker run -it $(DOCKER_EXTRA_ARG) -d -h pbs.dev.local --name pbsdev -v $(pwd):$(pwd) --privileged -w $(pwd) $(OS_TYPE) /bin/bash 
              docker exec pbsdev bash -c "$(PKG_INSTALL_CMD)"
-             docker exec --privileged pbsdev bash -c ".ci/ci --local"
+             docker exec --privileged pbsdev bash -c "pwd ; cd ci ;./ci --local"
